@@ -2,6 +2,9 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
 
+from channels.layers import get_channel_layer
+
+
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -28,6 +31,7 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json['message']
 
         # Send message to room group
+        # print('group_name', self.room_group_name)
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
@@ -44,3 +48,13 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
+
+#
+# def test_msg(room_name):
+#     channel_layer = get_channel_layer()
+#     channel_name = room_name
+#     print('channel_name', channel_name)
+#     async_to_sync(channel_layer.group_send)(channel_name, {
+#         "type": "chat_message",
+#         "text": f"welcome to channel:{channel_name}",
+#     })
